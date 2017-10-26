@@ -129,10 +129,9 @@ class GovernanceObject(BaseModel):
         subdikt = {k: dikt[k] for k in valid_keys if k in dikt}
 
         # hotfix for Decimal w/commas issue...
-        import string
         payment_amount = subdikt.get('payment_amount', '')
-        if (subclass == Proposal) and "," in payment_amount:
-            subdikt['payment_amount'] = string.replace(payment_amount, ',', '.', 1)
+        if (subclass == Proposal) and re.match('^47,5', payment_amount):
+            subdikt['payment_amount'] = re.sub(r',', '.', payment_amount, count=1)
 
         # get/create, then sync vote counts from dashd, with every run
         govobj, created = self.get_or_create(object_hash=object_hash, defaults=gobj_dict)
